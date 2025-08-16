@@ -125,6 +125,7 @@ players.on('connection', (socket) => {
   //console.log(socket.request.headers.cookie)
   socket.on('disconnect', () => {
     if (socket.roomcode){
+      console.log(socket.roomcode)
       io.of('/game').to(socket.roomcode).emit('player-left', { username:socket.username, id:socket.handshake.sessionID })
     }
     active_players.delete(socket.id)
