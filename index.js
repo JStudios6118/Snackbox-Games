@@ -68,8 +68,8 @@ app.get('/', function(req,res) {
   res.sendFile('index.html');
 })
 
-app.get('/game/:id', function(req,res) {
-  const roomcode = req.params.id;
+app.get('/game', function(req,res) {
+  const roomcode = req.session.player.roomcode
 
   if (req.session.player && active_rooms.has(roomcode)){
 
@@ -119,12 +119,17 @@ players.on('connection', (socket) => {
 
   //console.log(socket.request.headers.cookie)
 
-  socket.on('join-room', (roomcode) => {
+  socket.on('join-room', () => {
     if (active_players.has(socket.id)){ return }
     
-    const username = socket.handshake.session.player
+    const playerData = socket.handshake.session.player
+    const username = playerData.username;
+    const roomcode = playerData.roomcode;
+
     active_players.set(socket.id, { username, roomcode })
     socket.join(roomcode)
+
+    console.log(`Player ${username} has joined ${roomcode}`)
 
     io.of('/game').to(roomcode).emit('player-joined', { username })
 

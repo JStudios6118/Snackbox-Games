@@ -17,7 +17,7 @@ function check_room_availability(){
                     alert('Room Code not found!')
                     return;
                 }
-                window.location.href = `/game/${roomcode}`
+                window.location.href = `/game`
             })
         }
     })
