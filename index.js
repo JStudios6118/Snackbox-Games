@@ -125,6 +125,7 @@ game.use('connection', (socket,next) => {
 
 game.on('connection', (socket) => {
   socket.on('create-room', (gamemode) => {
+    console.log("WOWOWOWOWOWOWOWOW")
     const roomcode = create_room(gamemode);
     socket.emit('created-room', roomcode)
   })
