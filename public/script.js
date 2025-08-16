@@ -11,7 +11,14 @@ function check_room_availability(){
     })
     .then(response => {
         if (response.ok){
-            console.log(response)
+            const data = response.json()
+            .then(data => {
+                if (!data.success){
+                    alert('Room Code not found!')
+                    return;
+                }
+                window.location.href = `/game/${roomcode}`
+            })
         }
     })
 }
@@ -22,6 +29,6 @@ document.addEventListener('click', (e) => {
     const id = e.target.id;
     switch (id) {
         case 'join-button':
-
+            check_room_availability();
     }
 })

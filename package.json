@@ -9,6 +9,7 @@
   "author": "Josh C",
   "license": "ISC",
   "dependencies": {
+    "dotenv": "^17.2.1",
     "express": "^5.1.0",
     "express-session": "^1.18.2",
     "socket.io": "^4.8.1"
