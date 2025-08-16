@@ -131,7 +131,7 @@ players.on('connection', (socket) => {
 
     console.log(`Player ${username} has joined ${roomcode}`)
 
-    io.of('/game').to(roomcode).emit('player-joined', { username })
+    io.of('/game').to(roomcode).emit('player-joined', { username, id:socket.id })
 
     console.log(active_players)
   })
