@@ -92,16 +92,15 @@ app.get('/game', function(req,res) {
 app.post('/check-room', function(req,res) {
     const { username, roomcode } = req.body;
     // Get list of players in the room
-    const roomPlayers = Array.from(active_players.values())
-    .filter(p => p.roomCode === roomcode)
-    .map(p => p.username);
+    const roomPlayers = getPlayersInRoom(roomcode)
+    console.log(`PLayers ${JSON.stringify(roomPlayers)}`)
     // Check if room exists
     if (!active_rooms.has(roomcode)) {
-      return res.json({ success: false }); 
+      return res.json({ success: false, reason:"Room code not found" }); 
     }
     // Check if player already exists
     if (roomPlayers.includes(username)) {
-      return res.json({ success: false })
+      return res.json({ success: false, reason:"Username already taken" })
     }
     req.session.player = { roomcode, username };
     res.json({ success:true });
@@ -178,10 +177,10 @@ game.on('connection', (socket) => {
 
 // GAME HANDLERS
 
-function getPlayersInRoom(roomcode){
+function getPlayersInRoom(roomcode) {
   const roomPlayers = Array.from(active_players.values())
       .filter(p => p.roomcode === roomcode)
-      .map(p => ({ username: p.username, socketId: p.socketId }));
+      .map(p => p.username);
   return roomPlayers;
 }
 
@@ -191,7 +190,7 @@ function create_room(gamemode){
   while (true){
     roomcode = generateStringOfLetters(4);
     if (!active_rooms.has(roomcode)){
-      active_rooms.set(roomcode, { mode:gamemode, max_players:8, players:[] })
+      active_rooms.set(roomcode, { mode:gamemode, max_players:8})
       break;
     }
   }

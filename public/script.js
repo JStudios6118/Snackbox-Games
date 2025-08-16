@@ -14,7 +14,7 @@ function check_room_availability(){
             const data = response.json()
             .then(data => {
                 if (!data.success){
-                    alert('Room Code not found!')
+                    alert(data.reason)
                     return;
                 }
                 window.location.href = `/game`
