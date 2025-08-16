@@ -1,6 +1,8 @@
 ### SOCKET.IO REFERENCE FOR DISPLAY END ###
 
+[Create a New Room]
 Event: create-room
+    - gamemode (string with the name of the game)
 Desc: Creates a new room and returns the room id.
-return event: created-room
+Successful Return Event: created-room
     - roomcode (string of 4 letters)
