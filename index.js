@@ -5,7 +5,9 @@ const path = require('path');
 const http = require('http');
 const socketIo = require('socket.io');
 
-require("dotenv").config()
+require("dotenv").config();
+
+const { v4: uuidv4 } = require('uuid');
 
 const session = require('express-session');
 const sharedsession = require('express-socket.io-session');
@@ -22,7 +24,10 @@ const sessionMiddleware = session({
   secret: 'dedkedkeldked',
   resave: false,
   saveUninitialized: false, // No session stored unless modified
-  cookie: { secure: false, httpOnly: true } // Secure: true in production
+  cookie: { secure: false, httpOnly: true }, // Secure: true in production
+  genid: (req) => {
+      return uuidv4(); // Generate a new UUID for each session
+    },
 })
 
 // EXPRESS middleware
@@ -70,6 +75,7 @@ app.get('/', function(req,res) {
 
 app.get('/game', function(req,res) {
   const roomcode = req.session.player.roomcode
+  console.log(req.sessionID)
 
   if (req.session.player && active_rooms.has(roomcode)){
 
@@ -119,7 +125,7 @@ players.on('connection', (socket) => {
   //console.log(socket.request.headers.cookie)
   socket.on('disconnect', () => {
     if (socket.roomcode){
-      io.of('/game').to(roomcode).emit('player-left', { username, id:socket.id })
+      io.of('/game').to(socket.roomcode).emit('player-left', { username:socket.username, id:socket.handshake.sessionID })
     }
     active_players.delete(socket.id)
     console.log(active_players)
@@ -132,8 +138,10 @@ players.on('connection', (socket) => {
     const username = playerData.username;
     const roomcode = playerData.roomcode;
 
-    active_players.set(socket.id, { username, roomcode })
+    active_players.set(socket.id, { username, roomcode, id:socket.handshake.sessionID })
     socket.join(roomcode)
+
+    socket.username = username;
     socket.roomcode = roomcode
 
     console.log(`Player ${username} has joined ${roomcode}`)
