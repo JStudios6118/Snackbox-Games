@@ -127,13 +127,12 @@ game.use((socket,next) => {
 })
 
 game.on('connection', (socket) => {
-  
-  socket.emit('hello')
 
   socket.on('create-room', (data) => {
     const gamemode = data.gamemode
     const roomcode = create_room(gamemode);
-    socket.emit('created-room', roomcode)
+    socket.join(roomcode)
+    socket.emit('created-room', {roomcode})
   })
 })
 
@@ -152,4 +151,4 @@ function create_room(gamemode){
   return roomcode;
 }
 
-create_room('wisecrack');
+//create_room('wisecrack');
