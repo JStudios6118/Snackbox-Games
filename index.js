@@ -8,6 +8,7 @@ const socketIo = require('socket.io');
 require("dotenv").config()
 
 const session = require('express-session');
+const sharedsession = require('express-socket.io-session');
 
 // EXPRESS and SOCKET setup
 const app = express();
@@ -17,19 +18,23 @@ const io = socketIo(socket_server); // Attach Socket.IO to the same server
 
 //console.log(process.env)
 
+const sessionMiddleware = session({
+  secret: 'dedkedkeldked',
+  resave: false,
+  saveUninitialized: false, // No session stored unless modified
+  cookie: { secure: false, httpOnly: true } // Secure: true in production
+})
+
 // EXPRESS middleware
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname,"public")));
 
-app.use(session({
-  secret: 'dedkedkeldked',
-  resave: false,
-  saveUninitialized: false, // No session stored unless modified
-  cookie: { secure: false, httpOnly: true } // Secure: true in production
-}));
+app.use(sessionMiddleware);
 
 // ### VARIABLES ###############################################
+
+const alphabet = "abcdefghijklmnopqrstuvwxyz"
 
 let active_rooms = new Map();
 let active_players = new Map();
@@ -49,10 +54,10 @@ function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-function generateStringOfNumbers(length) {
+function generateStringOfLetters(length) {
   let result = '';
   for (let x=0; x<length; x++){
-    result += getRandomInt(0,9).toString()
+    result += alphabet[getRandomInt(0,alphabet.length)-1]
   }
   return result;
 }
@@ -88,7 +93,7 @@ app.post('/check-room', function(req,res) {
     const { username, roomcode } = req.body;
     // Get list of players in the room
     const roomPlayers = Array.from(active_players.values())
-    .filter(p => p.roomCode === roomCode)
+    .filter(p => p.roomCode === roomcode)
     .map(p => p.username);
     // Check if room exists
     if (!active_rooms.has(roomcode)) {
@@ -106,7 +111,21 @@ app.post('/check-room', function(req,res) {
 
 const players = io.of('/players')
 
+players.use(sharedsession(sessionMiddleware, {
+    autoSave:true
+})); 
+
 players.on('connection', (socket) => {
+
+  //console.log(socket.request.headers.cookie)
+
+  socket.on('join-room', (roomcode) => {
+    if (active_players.has(socket.id)){ return }
+    
+    const username = socket.handshake.session.player
+    active_players.set(socket.id, { username, roomcode })
+    console.log(active_players)
+  })
 
 })
 
@@ -115,11 +134,11 @@ players.on('connection', (socket) => {
 const game = io.of('/game');
 
 game.use((socket,next) => {
-  console.log('Handshake auth:', socket.handshake.auth);
+  //console.log('Handshake auth:', socket.handshake.auth);
   const auth_token = socket.handshake.auth;
   console.log(auth_token.auth)
   if (auth_token.auth === process.env.GODOT_AUTH_TOKEN){
-    console.log('NICE')
+    //console.log('NICE')
     next();
   } else {
     next(new Error("Unauthorized! Nice try"))
@@ -128,11 +147,23 @@ game.use((socket,next) => {
 
 game.on('connection', (socket) => {
 
+  socket.on('disconnect', () => {
+    if (socket.roomcode){
+      console.log("Deleted")
+      active_rooms.delete(socket.roomcode);
+    }
+    console.log(active_rooms)
+  })
+
   socket.on('create-room', (data) => {
-    const gamemode = data.gamemode
+    if (socket.roomcode){
+      socket.emit('create-room-failed', { 'reason':'The client has already created a room.' })
+    }
+    const gamemode = data.gamemode;
     const roomcode = create_room(gamemode);
-    socket.join(roomcode)
-    socket.emit('created-room', {roomcode})
+    socket.join(roomcode);
+    socket.roomcode = roomcode;
+    socket.emit('created-room', {roomcode});
   })
 })
 
@@ -141,7 +172,7 @@ game.on('connection', (socket) => {
 function create_room(gamemode){
   let roomcode = '';
   while (true){
-    roomcode = generateStringOfNumbers(4);
+    roomcode = generateStringOfLetters(4);
     if (!active_rooms.has(roomcode)){
       active_rooms.set(roomcode, { mode:gamemode })
       break;

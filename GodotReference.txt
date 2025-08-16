@@ -6,3 +6,5 @@ Event: create-room
 Desc: Creates a new room and returns the room id.
 Successful Return Event: created-room
     - roomcode (string of 4 letters)
+Unsuccessful Return Event: create-room-failed
+    - reason (string that contains a reason for failure)
