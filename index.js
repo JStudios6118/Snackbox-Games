@@ -117,6 +117,10 @@ players.use(sharedsession(sessionMiddleware, {
 players.on('connection', (socket) => {
 
   //console.log(socket.request.headers.cookie)
+  socket.on('disconnect', () => {
+    active_players.delete(socket.id)
+    console.log(active_players)
+  })
 
   socket.on('join-room', () => {
     if (active_players.has(socket.id)){ return }
