@@ -9,6 +9,15 @@ Successful Return Event: created-room
 Unsuccessful Return Event: create-room-failed
     - reason (string that contains a reason for failure)
 
+[Kick Player]
+Event: kick-player
+    - username (string with the username, this will the player kicked)
+    - id (id of the player. not currently in use)
+    - reason (a string with the reason for being kicked)
+        > default: 'You have been kicked'
+Desc: Used to kick the player. Useful in case you want to remove a player or if a player tries to join
+      in the middle of a game and they aren't the owner of the name.
+
 [Player Joined]
 Receive: player-joined
     - username (string with the username, please store on the godot)

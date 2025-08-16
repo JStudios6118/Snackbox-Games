@@ -134,7 +134,6 @@ players.on('connection', (socket) => {
 
   socket.on('join-room', () => {
     if (active_players.has(socket.id)){ return }
-    
     const playerData = socket.handshake.session.player
     const username = playerData.username;
     const roomcode = playerData.roomcode;
@@ -190,6 +189,12 @@ game.on('connection', (socket) => {
     socket.roomcode = roomcode;
     socket.emit('created-room', {roomcode});
   })
+
+  socket.on('kick-user', (username, id, reason='You have been kicked') => {
+    const player_to_kick = getKeyByValue(active_players, username);
+    active_players.delete(player_to_kick)
+    io.to(player_to_kick).emit('kicked', reason);
+  })
 })
 
 // GAME HANDLERS
@@ -199,6 +204,15 @@ function getPlayersInRoom(roomcode) {
       .filter(p => p.roomcode === roomcode)
       .map(p => p.username);
   return roomPlayers;
+}
+
+function getKeyByValue(map, searchValue) {
+  for (let [key, value] of map.entries()) {
+    if (value === searchValue) {
+      return key;
+    }
+  }
+  return undefined; // Return undefined if no match is found
 }
 
 
