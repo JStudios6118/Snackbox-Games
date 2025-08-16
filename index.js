@@ -57,7 +57,7 @@ function getRandomInt(min, max) {
 function generateStringOfLetters(length) {
   let result = '';
   for (let x=0; x<length; x++){
-    result += alphabet[getRandomInt(0,alphabet.length)-1]
+    result += alphabet[getRandomInt(0,alphabet.length-1)]
   }
   return result;
 }
