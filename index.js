@@ -38,7 +38,7 @@ active_rooms.set('aaaa', { mode:'wisecrack' })
 active_rooms.set('bbbb', { mode:'wisecrack' })
 
 socket_server.listen(port, () => {
-  console.log(`EXPRESS + Socket.IO | Server running on: rp5.local:${port}`);
+  console.log(`EXPRESS + Socket.IO | Server running on: localhost:${port}`);
 });
 
 // USEFULL FUNCTIONS
@@ -124,6 +124,7 @@ game.use('connection', (socket,next) => {
 })
 
 game.on('connection', (socket) => {
+  console.log("GHHHHHH")
   socket.on('create-room', (gamemode) => {
     console.log("WOWOWOWOWOWOWOWOW")
     const roomcode = create_room(gamemode);
