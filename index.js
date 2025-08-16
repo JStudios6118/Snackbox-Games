@@ -15,7 +15,7 @@ const port = 4009;
 const socket_server = http.createServer(app); // Create HTTP server for Express
 const io = socketIo(socket_server); // Attach Socket.IO to the same server
 
-console.log(process.env)
+//console.log(process.env)
 
 // EXPRESS middleware
 
@@ -43,8 +43,18 @@ socket_server.listen(port, () => {
 
 // USEFULL FUNCTIONS
 
-function getRandomInRange(min, max) {
-  return Math.random() * (max - min) + min;
+function getRandomInt(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function generateStringOfNumbers(length) {
+  let result = '';
+  for (let x=0; x<length; x++){
+    result += getRandomInt(0,9).toString()
+  }
+  return result;
 }
 
 // EXPRESS ROUTING
@@ -114,9 +124,25 @@ game.use('connection', (socket,next) => {
 })
 
 game.on('connection', (socket) => {
-  socket.on('create-room', (roomcode) => {
-    while (true){
-      const roomcode = Math.random
-    }
+  socket.on('create-room', (gamemode) => {
+    const roomcode = create_room(gamemode);
+    socket.emit('created-room', roomcode)
   })
 })
+
+// GAME HANDLERS
+
+function create_room(gamemode){
+  let roomcode = '';
+  while (true){
+    roomcode = generateStringOfNumbers(4);
+    if (!active_rooms.has(roomcode)){
+      active_rooms.set(roomcode, { mode:gamemode })
+      break;
+    }
+  }
+  console.log(active_rooms);
+  return roomcode;
+}
+
+create_room('wisecrack');

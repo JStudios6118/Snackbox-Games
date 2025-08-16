@@ -1,0 +1,6 @@
+### SOCKET.IO REFERENCE FOR DISPLAY END ###
+
+Event: create-room
+Desc: Creates a new room and returns the room id.
+return event: created-room
+    - roomcode (string of 4 letters)
