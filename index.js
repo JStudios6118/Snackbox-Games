@@ -124,6 +124,10 @@ players.on('connection', (socket) => {
     
     const username = socket.handshake.session.player
     active_players.set(socket.id, { username, roomcode })
+    socket.join(roomcode)
+
+    io.of('/game').to(roomcode).emit('player-joined', { username })
+
     console.log(active_players)
   })
 
@@ -169,12 +173,20 @@ game.on('connection', (socket) => {
 
 // GAME HANDLERS
 
+function getPlayersInRoom(roomcode){
+  const roomPlayers = Array.from(active_players.values())
+      .filter(p => p.roomcode === roomcode)
+      .map(p => ({ username: p.username, socketId: p.socketId }));
+  return roomPlayers;
+}
+
+
 function create_room(gamemode){
   let roomcode = '';
   while (true){
     roomcode = generateStringOfLetters(4);
     if (!active_rooms.has(roomcode)){
-      active_rooms.set(roomcode, { mode:gamemode })
+      active_rooms.set(roomcode, { mode:gamemode, max_players:8, players:[] })
       break;
     }
   }

@@ -8,3 +8,8 @@ Successful Return Event: created-room
     - roomcode (string of 4 letters)
 Unsuccessful Return Event: create-room-failed
     - reason (string that contains a reason for failure)
+
+[Player Joined]
+Receive: player-joined
+    - username (string with the username, please store on the godot)
+Desc: This event will be emitted when a player joins the room
