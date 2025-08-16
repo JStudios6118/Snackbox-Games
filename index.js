@@ -114,9 +114,12 @@ players.on('connection', (socket) => {
 
 const game = io.of('/game');
 
-game.use('connection', (socket,next) => {
+game.use((socket,next) => {
+  console.log('Handshake auth:', socket.handshake.auth);
   const auth_token = socket.handshake.auth;
-  if (auth_token === process.env.GODOT_AUTH_TOKEN){
+  console.log(auth_token.auth)
+  if (auth_token.auth === process.env.GODOT_AUTH_TOKEN){
+    console.log('NICE')
     next();
   } else {
     next(new Error("Unauthorized! Nice try"))
@@ -124,9 +127,11 @@ game.use('connection', (socket,next) => {
 })
 
 game.on('connection', (socket) => {
-  console.log("GHHHHHH")
-  socket.on('create-room', (gamemode) => {
-    console.log("WOWOWOWOWOWOWOWOW")
+  
+  socket.emit('hello')
+
+  socket.on('create-room', (data) => {
+    const gamemode = data.gamemode
     const roomcode = create_room(gamemode);
     socket.emit('created-room', roomcode)
   })
