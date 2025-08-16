@@ -118,6 +118,9 @@ players.on('connection', (socket) => {
 
   //console.log(socket.request.headers.cookie)
   socket.on('disconnect', () => {
+    if (socket.roomcode){
+      io.of('/game').to(roomcode).emit('player-left', { username, id:socket.id })
+    }
     active_players.delete(socket.id)
     console.log(active_players)
   })
@@ -131,6 +134,7 @@ players.on('connection', (socket) => {
 
     active_players.set(socket.id, { username, roomcode })
     socket.join(roomcode)
+    socket.roomcode = roomcode
 
     console.log(`Player ${username} has joined ${roomcode}`)
 

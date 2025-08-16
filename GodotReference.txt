@@ -12,4 +12,11 @@ Unsuccessful Return Event: create-room-failed
 [Player Joined]
 Receive: player-joined
     - username (string with the username, please store on the godot)
+    - id (a uuid that can be used to differentiate different users)
 Desc: This event will be emitted when a player joins the room
+
+[Player Left]
+Receive: player-left
+    - username (string witg the username so the username can be deleted from memory)
+    - id (a uuid that can be used to differentiate different users)
+Desc: Provides the game information about a player who left the room
