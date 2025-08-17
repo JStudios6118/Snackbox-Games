@@ -52,6 +52,14 @@ Desc: The purpose of this is to tell the display when a player has finished writ
       all of their responses. This indicated the final response has been submited.
       Useful for a countdown timer and visuals.
 
+[Start Player Vote]
+Event: send-vote
+    - responses (an array that contains the responses being voted on. just the string)
+        > ex: ["Response1","Response2"]
+    - voters (an array of the ids of all of the users who can vote aka the people who did not write any of the 2 responses)
+    - authors (an array of the ids of all of the users who cannot vote because they wrote one of the 2 responses)
+Desc: Sends the responses being voted on and the ids of the people who can vote and the ids of the people who cannot vote.
+
 [Player Vote]
 Receive: player-vote
     - id (the player id so you know who voted)

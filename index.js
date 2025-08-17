@@ -216,7 +216,16 @@ game.on('connection', (socket) => {
     const shuffled_prompts = shuffle_prompts(prompts, players);
   })
 
-  socket.on('send_vote', (data) => {
+  socket.on('send-vote', (data) => {
+    const { responses, voters, authors } = data;
+    const voter_map = voters.map(elm => getKeyByValue(active_players, 'id', elm)).filter(id => id !== undefined);
+    for (let x=0; x<voter_map.length;x++){
+      io.of('/players').to(voter_map[x]).emit('voting', responses, true)
+    }
+    const author_map = authors.map(elm => getKeyByValue(active_players, 'id', elm)).filter(id => id !== undefined);
+    for (let x=0; x<author_map.length;x++){
+      io.of('/players').to(author_map[x]).emit('voting', responses, false);
+    }
   });
 
 })
