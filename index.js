@@ -194,7 +194,7 @@ game.on('connection', (socket) => {
     socket.emit('created-room', {roomcode});
   })
 
-  socket.on('kick-user', async (id, reason='You have been kicked') => {
+  socket.on('kick-player', async (id, reason='You have been kicked') => {
     const player_to_kick = getKeyByValue(active_players, 'id', id);
     console.log(`start ${player_to_kick}`)
     active_players.delete(player_to_kick)
