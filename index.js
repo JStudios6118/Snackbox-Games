@@ -198,8 +198,7 @@ game.on('connection', (socket) => {
     const player_to_kick = getKeyByValue(active_players, 'id', id);
     console.log(`start ${player_to_kick}`)
     active_players.delete(player_to_kick)
-    await io.to(player_to_kick).emit('kicked', reason);
-    io.of('/players').sockets.connected[socket.id].disconnect();
+    io.to(player_to_kick).emit('kicked', reason);
   })
 
   socket.on('send-prompts', (data) => {

@@ -29,6 +29,9 @@ Receive: player-left
     - id (a uuid that can be used to differentiate different users)
 Desc: Provides the game information about a player who left the room
 
+[Send Prompts]
+Receive
+
 [Receive Prompt Response]
 Receive: prompt-reponse
     - response (the players response to the prompt)
