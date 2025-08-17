@@ -194,11 +194,12 @@ game.on('connection', (socket) => {
     socket.emit('created-room', {roomcode});
   })
 
-  socket.on('kick-player', async (id, reason='You have been kicked') => {
+  socket.on('kick-player', async (data) => {
+    const { id, reason } = data
     const player_to_kick = getKeyByValue(active_players, 'id', id);
     console.log(`start ${player_to_kick}`)
     active_players.delete(player_to_kick)
-    io.to(player_to_kick).emit('kicked', reason);
+    io.of('/players').to(player_to_kick).emit('kicked', reason);
   })
 
   socket.on('send-prompts', (data) => {
