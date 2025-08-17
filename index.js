@@ -190,8 +190,8 @@ game.on('connection', (socket) => {
     socket.emit('created-room', {roomcode});
   })
 
-  socket.on('kick-user', (username, id, reason='You have been kicked') => {
-    const player_to_kick = getKeyByValue(active_players, username);
+  socket.on('kick-user', (id, reason='You have been kicked') => {
+    const player_to_kick = getKeyByValue(active_players, id);
     active_players.delete(player_to_kick)
     io.to(player_to_kick).emit('kicked', reason);
     io.of('/players').sockets.connected[socket.id].disconnect();
@@ -214,6 +214,10 @@ function getKeyByValue(map, searchValue) {
     }
   }
   return undefined; // Return undefined if no match is found
+}
+
+function shuffle_prompts(prompts){
+  for ()
 }
 
 
