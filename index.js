@@ -217,7 +217,6 @@ game.on('connection', (socket) => {
   })
 
   socket.on('send_vote', (data) => {
-  
   });
 
 })
