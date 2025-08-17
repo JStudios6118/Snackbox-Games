@@ -217,7 +217,9 @@ function getKeyByValue(map, searchValue) {
 }
 
 function shuffle_prompts(prompts){
-  for ()
+  for (let x=0; x<prompts.length;i++){
+    
+  }
 }
 
 
