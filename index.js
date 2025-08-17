@@ -151,6 +151,10 @@ players.on('connection', (socket) => {
     console.log(active_players)
   })
 
+  socket.on('submit-response', (response, id) => {
+    io.of('/game').to(socket.roomcode).emit('prompt-response', { response, prompt_id:id, id:socket.handshake.sessionID })
+  })
+
 })
 
 // SOCKET.IO godot connection
@@ -190,12 +194,21 @@ game.on('connection', (socket) => {
     socket.emit('created-room', {roomcode});
   })
 
-  socket.on('kick-user', (id, reason='You have been kicked') => {
-    const player_to_kick = getKeyByValue(active_players, id);
+  socket.on('kick-user', async (id, reason='You have been kicked') => {
+    const player_to_kick = getKeyByValue(active_players, 'id', id);
     active_players.delete(player_to_kick)
-    io.to(player_to_kick).emit('kicked', reason);
+    await io.to(player_to_kick).emit('kicked', reason);
     io.of('/players').sockets.connected[socket.id].disconnect();
   })
+
+  socket.on('send-prompts', (data) => {
+    const { prompts, players } = data
+    console.log(`Prompts: ${JSON.stringify(prompts)} | Players: ${JSON.stringify(players)}`)
+    const shuffled_prompts = shuffle_prompts(prompts, players);
+
+  })
+
+  
 })
 
 // GAME HANDLERS
@@ -207,19 +220,57 @@ function getPlayersInRoom(roomcode) {
   return roomPlayers;
 }
 
-function getKeyByValue(map, searchValue) {
+function getKeyByValue(map, property, searchValue) {
   for (let [key, value] of map.entries()) {
-    if (value === searchValue) {
+    if (value[property] === searchValue) {
       return key;
     }
   }
-  return undefined; // Return undefined if no match is found
+  return undefined;
 }
 
-function shuffle_prompts(prompts){
-  for (let x=0; x<prompts.length;i++){
-    
+// ['soc']
+
+function shuffle_prompts(prompts, userlist){
+  userlist = userlist.map(elm => getKeyByValue(active_players, 'id', elm)).filter(id => id !== undefined);
+
+  let pairs = Array.from({ length: prompts.length }, () => []);
+
+  let final_pairs = []
+
+  console.log(userlist)
+
+  for (x=0;x<prompts.length;x++){
+    console.log(`ITERATION ${x}`)
+    const pair_num = getRandomInt(0,pairs.length-1);
+    //console.log(prompts[x])
+    pairs[pair_num].push(prompts[x]);
+
+    let new_pair_num = 0
+    do {
+      new_pair_num = getRandomInt(0,pairs.length-1);
+    } while (new_pair_num == pair_num);
+    pairs[new_pair_num].push(prompts[x])
+
+    let offset = 0
+
+    const pairs_length = pairs.length
+
+    for(i=0;i<pairs_length;i++){
+      //console.log(`CHECK PAIR ${JSON.stringify(pairs[i])}, OFFSET ${offset}, OTHER ${pairs[i-offset]}`)
+      if (pairs[i-offset].length >= 2){
+        let item = pairs.splice(i-offset, 1)[0];
+        //console.log(`pair ${item}`)
+        final_pairs.push(item)
+        offset += 1
+      }
+    }
   }
+  for (x=0;x<userlist.length;x++){
+    io.of('/players').to(userlist[x]).emit('prompts',final_pairs[x])
+  }
+
+  console.log(`FINAL PAIRS ${JSON.stringify(final_pairs)}`)
 }
 
 

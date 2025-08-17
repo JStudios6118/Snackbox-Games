@@ -28,3 +28,18 @@ Receive: player-left
     - username (string witg the username so the username can be deleted from memory)
     - id (a uuid that can be used to differentiate different users)
 Desc: Provides the game information about a player who left the room
+
+[Receive Prompt Response]
+Receive: prompt-reponse
+    - response (the players response to the prompt)
+    - prompt_id (the id of the prompt so it can be handled appropriately)
+    - id (the player id so the origin of the response can be tracked during voting)
+Desc: This is received when the player send a response to the server. This may not
+      necassarily be the last message during the writing from the player.
+
+[Player Finished Writing]
+Receive: player-finished
+    - id (the id of the player)
+Desc: The purpose of this is to tell the display when a player has finished writing
+      all of their responses. This indicated the final response has been submited.
+      Useful for a countdown timer and visuals.
