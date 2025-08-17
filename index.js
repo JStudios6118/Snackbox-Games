@@ -156,7 +156,7 @@ players.on('connection', (socket) => {
   })
 
   socket.on('finished-responding', () => {
-    io.of('/game').to(socket.roomcode).emit('player-finished', { id: socker.handshake.sessionID })
+    io.of('/game').to(socket.roomcode).emit('player-finished', { id: socket.handshake.sessionID })
   })
 
 })
