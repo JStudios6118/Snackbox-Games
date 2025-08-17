@@ -17,7 +17,7 @@ socket.on('kicked', (reason) => {
 })
 
 socket.on('prompts', (cur_prompts) => {
-    console.log(prompts)
+    console.log(cur_prompts)
     prompt_mode = true;
     prompts = cur_prompts
     document.getElementById('prompt-area').classList.remove('hidden');
@@ -26,15 +26,12 @@ socket.on('prompts', (cur_prompts) => {
 
 function displayNextPrompt(){
     document.getElementById('prompt-input').value = "";
-    document.getElementById('prompt-text').innerText = prompts[prompt_index];
+    document.getElementById('prompt-text').innerText = prompts[prompt_index].prompt;
 }
 
 function promptSubmitPressed(){
     const response = document.getElementById('prompt-input').value;
-    displayNextPrompt();
-    document.getElementById('prompt-input').value = "";
-    document.getElementById('prompt-text').innerText = prompts[prompt_index];
-    socket.emit('submit-response', response, id)
+    socket.emit('submit-response', response, prompts[prompt_index].id)
     prompt_index += 1
 
     if (prompt_index >= 2){
@@ -44,6 +41,8 @@ function promptSubmitPressed(){
         prompt_mode = false
         socket.emit('finished-responding')
         return;
+    } else {
+        displayNextPrompt();
     }
 }
 
