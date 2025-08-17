@@ -209,7 +209,6 @@ game.on('connection', (socket) => {
 
   })
 
-  
 })
 
 // GAME HANDLERS

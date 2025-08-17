@@ -30,7 +30,9 @@ Receive: player-left
 Desc: Provides the game information about a player who left the room
 
 [Send Prompts]
-Receive
+Event: send-prompts
+    - prompts (list of objects that contain the prompts and prompt id)
+    - players (a list of all of the player ids actively playing in the lobby. Just as a string, no arrays or objects)
 
 [Receive Prompt Response]
 Receive: prompt-reponse
