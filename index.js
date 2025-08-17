@@ -159,6 +159,10 @@ players.on('connection', (socket) => {
     io.of('/game').to(socket.roomcode).emit('player-finished', { id: socket.handshake.sessionID })
   })
 
+  socket.on('vote', (button_num) => {
+    io.of("/game").to(socket.roomcode).emit('player-vote', { id:socket.handshake.sessionID, vote: button_num})
+  })
+
 })
 
 // SOCKET.IO godot connection
@@ -211,6 +215,10 @@ game.on('connection', (socket) => {
     console.log(`Prompts: ${JSON.stringify(prompts)} | Players: ${JSON.stringify(players)}`)
     const shuffled_prompts = shuffle_prompts(prompts, players);
   })
+
+  socket.on('send_vote', (data) => {
+  
+  });
 
 })
 

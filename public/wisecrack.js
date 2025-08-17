@@ -4,6 +4,8 @@ let prompt_mode = false;
 let prompts = []
 let prompt_index = 0;
 
+let vote_mode = false;
+
 let responses = []
 
 function connect_to_room(){
@@ -22,6 +24,21 @@ socket.on('prompts', (cur_prompts) => {
     prompts = cur_prompts
     document.getElementById('prompt-area').classList.remove('hidden');
     displayNextPrompt()
+})
+
+socket.on('voting', (data) => {
+    const { responses, allowed_to_vote} = data
+
+    if (allowed_to_vote){
+        let voting = true;
+        document.getElementById('voting-area').classList.remove('hidden');
+
+        document.getElementById('vote-button-one').innerText = responses[0];
+        document.getElementById('vote-button-one').innerText = responses[1];
+    } else {
+        voting = true;
+        document.getElementById('voting-not-allowed-area').classList.remove('hidden');
+    }
 })
 
 function displayNextPrompt(){
@@ -46,6 +63,13 @@ function promptSubmitPressed(){
     }
 }
 
+function voteButtonPressed(button_num){
+    voting = false;
+    document.getElementById('voting-area').classList.add('hidden');
+    document.getElementById('voting-not-allowed-area').classList.add('hidden');
+    socket.emit('vote', button_num)
+}
+
 document.addEventListener('click', (e) => {
     const id = e.target.id;
 
@@ -53,6 +77,10 @@ document.addEventListener('click', (e) => {
         case 'prompt-submit':
             promptSubmitPressed();
             break;
+        case 'vote-button-one':
+            voteButtonPressed(1);
+        case 'vote-button-two':
+            voteButtonPressed(2);
         default:
             return;
     }
