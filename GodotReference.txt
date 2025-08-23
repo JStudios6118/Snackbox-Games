@@ -29,6 +29,10 @@ Receive: player-left
     - id (a uuid that can be used to differentiate different users)
 Desc: Provides the game information about a player who left the room
 
+[Times Up]
+Event: times-up
+Desc: Send this when the time is up no matter which phase the game is in.
+
 [Send Prompts]
 Event: send-prompts
     - prompts (list of objects that contain the prompts and prompt id)
@@ -38,7 +42,7 @@ Event: send-prompts
 Desc: Send prompts to players. This will start a prompt writing round.
 
 [Receive Prompt Response]
-Receive: prompt-reponse
+Receive: prompt-response
     - response (the players response to the prompt)
     - prompt_id (the id of the prompt so it can be handled appropriately)
     - id (the player id so the origin of the response can be tracked during voting)

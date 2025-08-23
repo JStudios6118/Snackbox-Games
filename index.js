@@ -28,6 +28,9 @@ const sessionMiddleware = session({
   genid: (req) => {
       return uuidv4(); // Generate a new UUID for each session
     },
+  cookie: {
+      maxAge: 1800000, // 1 hour in milliseconds
+    },
 })
 
 // EXPRESS middleware
@@ -210,6 +213,10 @@ game.on('connection', (socket) => {
     io.of('/players').to(player_to_kick).emit('kicked', reason);
   })
 
+  socket.on('times-up', () => {
+    io.of('/players').to(socket.roomcode).emit('times-up')
+  })
+
   socket.on('send-prompts', (data) => {
     const { prompts, players } = data
     console.log(`Prompts: ${JSON.stringify(prompts)} | Players: ${JSON.stringify(players)}`)
@@ -219,10 +226,12 @@ game.on('connection', (socket) => {
   socket.on('send-vote', (data) => {
     const { responses, voters, authors } = data;
     const voter_map = voters.map(elm => getKeyByValue(active_players, 'id', elm)).filter(id => id !== undefined);
+    console.log(`VM: ${voter_map}`)
     for (let x=0; x<voter_map.length;x++){
       io.of('/players').to(voter_map[x]).emit('voting', responses, true)
     }
     const author_map = authors.map(elm => getKeyByValue(active_players, 'id', elm)).filter(id => id !== undefined);
+    console.log(`AM: ${author_map}`)
     for (let x=0; x<author_map.length;x++){
       io.of('/players').to(author_map[x]).emit('voting', responses, false);
     }

@@ -18,6 +18,19 @@ socket.on('kicked', (reason) => {
     window.location.href="/"
 })
 
+socket.on('times-up', () => {
+    
+    prompt_mode = false;
+    vote_mode = false;
+
+    document.getElementById('prompt-input').value = "";
+    document.getElementById('prompt-area').classList.add('hidden');
+    prompt_index = 0;
+
+    document.getElementById('voting-area').classList.add('hidden');
+    document.getElementById('voting-not-allowed-area').classList.add('hidden');
+})
+
 socket.on('prompts', (cur_prompts) => {
     console.log(cur_prompts)
     prompt_mode = true;
@@ -26,17 +39,16 @@ socket.on('prompts', (cur_prompts) => {
     displayNextPrompt()
 })
 
-socket.on('voting', (data) => {
-    const { responses, allowed_to_vote} = data
+socket.on('voting', (responses, allowed_to_vote) => {
 
     if (allowed_to_vote){
-        let voting = true;
+        vote_mode = true;
         document.getElementById('voting-area').classList.remove('hidden');
 
         document.getElementById('vote-button-one').innerText = responses[0];
-        document.getElementById('vote-button-one').innerText = responses[1];
+        document.getElementById('vote-button-two').innerText = responses[1];
     } else {
-        voting = true;
+        vote_mode = true;
         document.getElementById('voting-not-allowed-area').classList.remove('hidden');
     }
 })
