@@ -41,6 +41,8 @@ socket.on('prompts', (cur_prompts) => {
 
 socket.on('voting', (responses, allowed_to_vote) => {
 
+    document.getElementById('voting-not-allowed-area').classList.add('hidden');
+
     if (allowed_to_vote){
         vote_mode = true;
         document.getElementById('voting-area').classList.remove('hidden');
@@ -48,7 +50,7 @@ socket.on('voting', (responses, allowed_to_vote) => {
         document.getElementById('vote-button-one').innerText = responses[0];
         document.getElementById('vote-button-two').innerText = responses[1];
     } else {
-        vote_mode = true;
+        vote_mode = false;
         document.getElementById('voting-not-allowed-area').classList.remove('hidden');
     }
 })
@@ -76,10 +78,12 @@ function promptSubmitPressed(){
 }
 
 function voteButtonPressed(button_num){
-    voting = false;
-    document.getElementById('voting-area').classList.add('hidden');
-    document.getElementById('voting-not-allowed-area').classList.add('hidden');
-    socket.emit('vote', button_num)
+    if (vote_mode){
+        document.getElementById('voting-area').classList.add('hidden');
+        document.getElementById('voting-not-allowed-area').classList.add('hidden');
+        socket.emit('vote', button_num)
+    }
+    vote_mode = false;
 }
 
 document.addEventListener('click', (e) => {

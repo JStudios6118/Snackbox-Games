@@ -259,46 +259,26 @@ function getKeyByValue(map, property, searchValue) {
 
 // ['soc']
 
-function shuffle_prompts(prompts, userlist){
+function shuffle_prompts(prompts, userlist) {
   userlist = userlist.map(elm => getKeyByValue(active_players, 'id', elm)).filter(id => id !== undefined);
 
-  let pairs = Array.from({ length: prompts.length }, () => []);
+  // Shuffle prompts
+  let shuffled = [...prompts].sort(() => Math.random() - 0.5);
+  let final_pairs = [];
 
-  let final_pairs = []
-
-  console.log(userlist)
-
-  for (x=0;x<prompts.length;x++){
-    console.log(`ITERATION ${x}`)
-    const pair_num = getRandomInt(0,pairs.length-1);
-    //console.log(prompts[x])
-    pairs[pair_num].push(prompts[x]);
-
-    let new_pair_num = 0
-    do {
-      new_pair_num = getRandomInt(0,pairs.length-1);
-    } while (new_pair_num == pair_num);
-    pairs[new_pair_num].push(prompts[x])
-
-    let offset = 0
-
-    const pairs_length = pairs.length
-
-    for(i=0;i<pairs_length;i++){
-      //console.log(`CHECK PAIR ${JSON.stringify(pairs[i])}, OFFSET ${offset}, OTHER ${pairs[i-offset]}`)
-      if (pairs[i-offset].length >= 2){
-        let item = pairs.splice(i-offset, 1)[0];
-        //console.log(`pair ${item}`)
-        final_pairs.push(item)
-        offset += 1
-      }
-    }
-  }
-  for (x=0;x<userlist.length;x++){
-    io.of('/players').to(userlist[x]).emit('prompts',final_pairs[x])
+  // Create pairs in a circular pattern
+  for (let i = 0; i < userlist.length; i++) {
+    let prompt1 = shuffled[i];
+    let prompt2 = shuffled[(i + 1) % shuffled.length];
+    final_pairs.push([prompt1, prompt2]);
   }
 
-  console.log(`FINAL PAIRS ${JSON.stringify(final_pairs)}`)
+  // Send pairs to players
+  for (let x = 0; x < userlist.length; x++) {
+    io.of('/players').to(userlist[x]).emit('prompts', final_pairs[x]);
+  }
+
+  console.log(`FINAL PAIRS ${JSON.stringify(final_pairs)}`);
 }
 
 
